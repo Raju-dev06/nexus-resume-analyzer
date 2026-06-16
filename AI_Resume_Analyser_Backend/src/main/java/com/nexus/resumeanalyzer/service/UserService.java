@@ -16,6 +16,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
     public User registerUser(String username, String email, String password, String role) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username is already taken.");
@@ -24,14 +27,33 @@ public class UserService {
             throw new IllegalArgumentException("Email is already registered.");
         }
 
+        String verificationToken = java.util.UUID.randomUUID().toString();
+
         User user = User.builder()
                 .username(username)
                 .email(email)
                 .password(passwordEncoder.encode(password)) // BCrypt hash — never plain text
                 .role(role != null && !role.isBlank() ? role : "USER")
+                .isVerified(false)
+                .verificationToken(verificationToken)
+                .provider("LOCAL")
                 .build();
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+        return user;
+    }
+
+    public boolean verifyEmail(String token) {
+        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setIsVerified(true);
+            user.setVerificationToken(null); // Clear the token
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     public Optional<User> findByEmail(String email) {

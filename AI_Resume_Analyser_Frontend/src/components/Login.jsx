@@ -57,6 +57,19 @@ import { AlertCircle, CheckCircle2, Mail, Lock } from 'lucide-react';
                 </button>
               </form>
 
+              <div className="position-relative my-4 text-center">
+                <hr className="border-light border-opacity-10" />
+                <span className="position-absolute top-50 start-50 translate-middle bg-dark px-3 text-secondary small">or</span>
+              </div>
+
+              <a 
+                href={`${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`} 
+                className="btn btn-outline-light w-100 py-3 mb-3 d-flex align-items-center justify-content-center gap-2"
+              >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="18" />
+                <span>Sign in with Google</span>
+              </a>
+
               <div className="text-center mt-3">
                 <span className="text-secondary small">Don't have an account? </span>
                 <button

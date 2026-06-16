@@ -69,6 +69,10 @@ public class AuthController {
         }
 
         User user = userOpt.get();
+        if ("LOCAL".equals(user.getProvider()) && !user.getIsVerified()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Please verify your email before logging in.");
+        }
+
         return ResponseEntity.ok(
                 AuthResponse.builder()
                         .message("Sign in successful.")
@@ -79,5 +83,15 @@ public class AuthController {
                         .token(jwt)
                         .build()
         );
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+        boolean isVerified = userService.verifyEmail(token);
+        if (isVerified) {
+            return ResponseEntity.ok("Email successfully verified. You can now log in.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired verification token.");
+        }
     }
 }

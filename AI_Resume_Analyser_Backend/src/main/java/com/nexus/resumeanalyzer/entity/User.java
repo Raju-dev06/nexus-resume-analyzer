@@ -29,6 +29,20 @@ public class User {
     @Builder.Default
     private String role = "USER"; // "USER" or "ADMIN"
 
+    @Column(name = "is_verified", nullable = false)
+    @Builder.Default
+    private Boolean isVerified = false;
+
+    @Column(name = "provider", length = 50)
+    @Builder.Default
+    private String provider = "LOCAL"; // "LOCAL" or "GOOGLE"
+
+    @Column(name = "provider_id")
+    private String providerId;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
