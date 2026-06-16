@@ -9,18 +9,11 @@ import AnalyzeSetup from './components/AnalyzeSetup';
 import Loading from './components/Loading';
 import Results from './components/Results';
 import History from './components/History';
-import VerifyEmail from './components/VerifyEmail';
-import OAuthRedirectHandler from './components/OAuthRedirectHandler';
 
 function App() {
   // Navigation / View State
-  // Views: 'landing' | 'login' | 'signup' | 'dashboard' | 'analyze_setup' | 'loading' | 'results' | 'history' | 'verify_email' | 'oauth_redirect'
-  const [view, setView] = useState(() => {
-    const path = window.location.pathname;
-    if (path === '/verify-email') return 'verify_email';
-    if (path === '/oauth2/redirect') return 'oauth_redirect';
-    return 'landing';
-  });
+  // Views: 'landing' | 'login' | 'signup' | 'dashboard' | 'analyze_setup' | 'loading' | 'results' | 'history'
+  const [view, setView] = useState('landing');
 
   // User Authentication State
   const [user, setUser] = useState(null) // { email, username, role: 'USER' }
@@ -176,13 +169,13 @@ function App() {
         body: JSON.stringify({ username: signupUsername, email: signupEmail, password: signupPassword })
       });
       if (res.ok) {
-        setAuthSuccess('Account created! Please check your email to verify your account before logging in.')
+        setAuthSuccess('Account created successfully! Redirecting to login...')
         setTimeout(() => {
           setLoginEmail(signupEmail)
           setLoginPassword(signupPassword)
           setAuthSuccess('')
           setView('login')
-        }, 5000)
+        }, 1500)
       } else {
         const errText = await res.text();
         setAuthError(errText || 'Failed to register account.');
@@ -392,8 +385,6 @@ function App() {
       case 'loading': return <Loading loadingProgress={loadingProgress} loadingStepText={loadingStepText} />;
       case 'results': return <Results currentAnalysis={currentAnalysis} setView={setView} handlePrintReport={handlePrintReport} loadingJobs={loadingJobs} matchingJobs={matchingJobs} />;
       case 'history': return <History historyList={historyList} historySearchQuery={historySearchQuery} setHistorySearchQuery={setHistorySearchQuery} setCurrentAnalysis={setCurrentAnalysis} setView={setView} handleDeleteHistory={handleDeleteHistory} filteredHistory={filteredHistory} />;
-      case 'verify_email': return <VerifyEmail setView={setView} />;
-      case 'oauth_redirect': return <OAuthRedirectHandler setUser={setUser} setView={setView} />;
       default: return <Landing user={user} setView={setView} />;
     }
   }

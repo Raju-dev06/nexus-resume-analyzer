@@ -21,17 +21,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import com.nexus.resumeanalyzer.security.OAuth2LoginSuccessHandler;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Value("${cors.allowed-origin}")
     private String allowedOrigin;
@@ -53,13 +48,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for stateless REST API
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/login/oauth2/**", "/oauth2/**").permitAll() // Authenticate registration/logins
+                        .requestMatchers("/api/auth/**").permitAll() // Authenticate registration/logins
                         .requestMatchers("/api/jobs/**").permitAll() // Real-time job matching routes
                         .requestMatchers("/api/resumes/**").authenticated() // Secure resume scanning routes
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // Secure admin dashboard routes
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2LoginSuccessHandler));
+                        .anyRequest().authenticated());
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
