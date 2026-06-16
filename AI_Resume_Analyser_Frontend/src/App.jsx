@@ -61,21 +61,23 @@ function App() {
       })
         .then(res => res.json())
         .then(data => {
-          // Flatten backend structure to match frontend expectations
-          const formatted = Array.isArray(data) ? data.map(item => ({
-            ...item,
-            id: item.resume?.id || item.id,
-            fileName: item.resume?.fileName || 'resume_doc.pdf',
-            role: item.resume?.roleApplied || 'Unknown',
-            experience: item.resume?.experienceYears || 0,
-            date: item.analyzedAt || new Date().toISOString(),
-            skills: {
-              hard: [],
-              soft: [],
-              missing: []
-            },
-            suggestions: item.suggestions ? JSON.parse(item.suggestions) : []
-          })) : [];
+          const formatted = Array.isArray(data) ? data.map(item => {
+            let parsedSuggestions = [];
+            try {
+              if (item.suggestions) parsedSuggestions = JSON.parse(item.suggestions);
+            } catch (e) { console.error("Error parsing suggestions:", e); }
+
+            return {
+              ...item,
+              id: item.resume?.id || item.id,
+              fileName: item.resume?.fileName || 'resume_doc.pdf',
+              role: item.resume?.roleApplied || 'Unknown',
+              experience: item.resume?.experienceYears || 0,
+              date: item.analyzedAt || new Date().toISOString(),
+              skills: { hard: [], soft: [], missing: [] },
+              suggestions: parsedSuggestions
+            };
+          }) : [];
           setHistoryList(formatted);
         })
         .catch(err => console.error('Failed to fetch history', err))
