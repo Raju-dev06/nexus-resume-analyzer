@@ -44,7 +44,6 @@ public class AnalysisService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String uploadDir = "uploads/resumes/";
 
-    @Transactional
     public Analysis runResumeAnalysis(MultipartFile file, String role, Integer experience,
                                       String jobDescription, User user) throws IOException {
 
