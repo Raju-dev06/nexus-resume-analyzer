@@ -55,8 +55,9 @@ public class ResumeController {
         }
 
         Analysis analysis = analysisService.runResumeAnalysis(file, role, experience, jobDescription, userOpt.get());
-        
-        // Return clean response containing score highlights. Full details available via relationship.
+
+        // Return clean response containing score highlights. Full details available via
+        // relationship.
         return ResponseEntity.ok(analysis);
     }
 
@@ -71,8 +72,8 @@ public class ResumeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User profile not found.");
         }
 
-        List<Resume> resumes = resumeRepository.findByUserOrderByUploadedAtDesc(userOpt.get());
-        return ResponseEntity.ok(resumes);
+        List<Analysis> analyses = analysisRepository.findByResumeUserOrderByAnalyzedAtDesc(userOpt.get());
+        return ResponseEntity.ok(analyses);
     }
 
     /**
@@ -85,7 +86,7 @@ public class ResumeController {
         if (resumeOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found.");
         }
-        
+
         Resume resume = resumeOpt.get();
         if (!resume.getUser().getEmail().equals(email)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized to delete this record.");
