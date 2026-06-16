@@ -18,7 +18,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resumes")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ResumeController {
 
     @Autowired
