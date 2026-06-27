@@ -52,6 +52,29 @@ function App() {
 
   // (admin panel removed)
 
+  // Auto-login on page reload if token exists and is valid
+  useEffect(() => {
+    const savedToken = localStorage.getItem('nexus_token');
+    if (savedToken) {
+      try {
+        const payload = JSON.parse(atob(savedToken.split('.')[1]));
+        if (payload.exp * 1000 > Date.now()) {
+          setUser({
+            email: payload.sub,
+            username: payload.sub.split('@')[0], // Fallback username
+            role: 'USER', // Fallback role
+            token: savedToken
+          });
+          setView('dashboard');
+        } else {
+          localStorage.removeItem('nexus_token');
+        }
+      } catch (e) {
+        localStorage.removeItem('nexus_token');
+      }
+    }
+  }, []);
+
   // Load history whenever user changes or navigates to history
   useEffect(() => {
     if (user && user.token && (view === 'history' || view === 'dashboard' || view === 'results')) {
