@@ -65,7 +65,8 @@ function App() {
             role: 'USER', // Fallback role
             token: savedToken
           });
-          setView('dashboard');
+          const lastView = sessionStorage.getItem('nexus_last_view') || 'dashboard';
+          setView(lastView);
         } else {
           localStorage.removeItem('nexus_token');
         }
@@ -74,6 +75,13 @@ function App() {
       }
     }
   }, []);
+
+  // Save the current view to sessionStorage so we don't lose it on refresh
+  useEffect(() => {
+    if (view !== 'landing' && view !== 'login' && view !== 'signup') {
+      sessionStorage.setItem('nexus_last_view', view);
+    }
+  }, [view]);
 
   // Load history whenever user changes or navigates to history
   useEffect(() => {
