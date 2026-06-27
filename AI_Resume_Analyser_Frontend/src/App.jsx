@@ -8,6 +8,7 @@ import AnalyzeSetup from './components/AnalyzeSetup';
 import Loading from './components/Loading';
 import Results from './components/Results';
 import History from './components/History';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   // Navigation / View State
@@ -425,6 +426,7 @@ function App() {
       case 'loading': return <Loading loadingProgress={loadingProgress} loadingStepText={loadingStepText} />;
       case 'results': return <Results currentAnalysis={currentAnalysis} setView={setView} handlePrintReport={handlePrintReport} loadingJobs={loadingJobs} matchingJobs={matchingJobs} />;
       case 'history': return <History historyList={historyList} historySearchQuery={historySearchQuery} setHistorySearchQuery={setHistorySearchQuery} setCurrentAnalysis={setCurrentAnalysis} setView={setView} handleDeleteHistory={handleDeleteHistory} filteredHistory={filteredHistory} />;
+      case 'admin': return (user && user.role === 'ADMIN') ? <AdminDashboard user={user} /> : <Dashboard dragActive={dragActive} handleDrag={handleDrag} handleDrop={handleDrop} handleFileInput={handleFileInput} />;
       default: return <Landing user={user} setView={setView} />;
     }
   }

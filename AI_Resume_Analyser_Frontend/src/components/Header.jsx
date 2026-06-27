@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, ShieldCheck } from 'lucide-react';
 
   // Header Navigation Component
   export default function Header({ view, setView, user, handleSignOut, setAuthError, setAuthSuccess }) {
@@ -37,6 +37,14 @@ import { User, LogOut } from 'lucide-react';
                   >
                     History Logs
                   </button>
+                  {user.role === 'ADMIN' && (
+                    <button
+                      onClick={() => setView('admin')}
+                      className={`btn btn-link text-decoration-none py-1 px-2 d-flex align-items-center gap-1 ${view === 'admin' ? 'text-white border-bottom border-indigo border-2' : 'text-indigo'}`}
+                    >
+                      <ShieldCheck size={16} /> Admin Panel
+                    </button>
+                  )}
                 </nav>
 
                 <div className="dropdown d-flex align-items-center gap-2 bg-dark bg-opacity-40 py-2 px-3 rounded-pill border border-light border-opacity-10">
