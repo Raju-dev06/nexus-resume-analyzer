@@ -61,9 +61,17 @@ function App() {
         .then(res => res.json())
         .then(data => {
           const formatted = Array.isArray(data) ? data.map(item => {
-            let parsedSuggestions = [];
+            let suggestionsList = [];
+            let parsedData = {};
             try {
-              if (item.suggestions) parsedSuggestions = JSON.parse(item.suggestions);
+              if (item.suggestions && item.suggestions !== '[]') {
+                parsedData = JSON.parse(item.suggestions);
+                if (Array.isArray(parsedData)) {
+                    suggestionsList = parsedData;
+                } else if (parsedData.suggestions) {
+                    suggestionsList = parsedData.suggestions;
+                }
+              }
             } catch (e) { console.error("Error parsing suggestions:", e); }
 
             return {
@@ -73,8 +81,13 @@ function App() {
               role: item.resume?.roleApplied || 'Unknown',
               experience: item.resume?.experienceYears || 0,
               date: item.analyzedAt || new Date().toISOString(),
-              skills: { hard: [], soft: [], missing: [] },
-              suggestions: parsedSuggestions
+              skills: { 
+                hard: parsedData.matchedHardSkills || [], 
+                soft: parsedData.matchedSoftSkills || [], 
+                missing: parsedData.missingSkills || [] 
+              },
+              suggestions: suggestionsList,
+              feedback: item.overallFeedback
             };
           }) : [];
           setHistoryList(formatted);
