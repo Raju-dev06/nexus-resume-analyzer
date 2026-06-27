@@ -38,7 +38,22 @@ function App() {
   const [loadingStepText, setLoadingStepText] = useState('Initializing...')
 
   // Analysis Output State
-  const [currentAnalysis, setCurrentAnalysis] = useState(null)
+  const [currentAnalysis, setCurrentAnalysis] = useState(() => {
+    const saved = sessionStorage.getItem('nexus_current_analysis');
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (currentAnalysis) {
+      sessionStorage.setItem('nexus_current_analysis', JSON.stringify(currentAnalysis));
+    } else {
+      sessionStorage.removeItem('nexus_current_analysis');
+    }
+  }, [currentAnalysis]);
 
   // History State
   const [historyList, setHistoryList] = useState([])
