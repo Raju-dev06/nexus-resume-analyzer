@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { History as HistoryIcon } from 'lucide-react'
 import Header from './components/Header';
 import Landing from './components/Landing';
 import Login from './components/Login';
@@ -355,24 +354,6 @@ function App() {
     item.role.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
     item.fileName.toLowerCase().includes(historySearchQuery.toLowerCase())
   )
-
-  // CSS Circular progress calculations
-  const calculateCircleDash = (score) => {
-    const radius = 70
-    const circumference = 2 * Math.PI * radius
-    const offset = circumference - (score / 100) * circumference
-    return { circumference, offset }
-  }
-
-  // Color mapper for scores
-  const getScoreColor = (score) => {
-    if (score >= 75) return '#10b981' // emerald
-    if (score >= 50) return '#f59e0b' // amber
-    return '#ef4444' // red
-  }
-
-  // Sub-components as local renderers
-
 
   // Active view routing manager
   const renderCurrentView = () => {

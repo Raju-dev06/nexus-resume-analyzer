@@ -16,5 +16,7 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
     
     @Query("SELECT a FROM Analysis a JOIN FETCH a.resume r WHERE r.user = :user ORDER BY a.analyzedAt DESC")
     List<Analysis> findByResumeUserOrderByAnalyzedAtDesc(@Param("user") User user);
-}
 
+    @Query("SELECT AVG(a.atsScore) FROM Analysis a")
+    Double findAverageAtsScore();
+}

@@ -28,6 +28,22 @@ public class AIService {
             
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final String ATS_PROMPT_TEMPLATE = 
+            "You are an expert recruiter and Applicant Tracking System (ATS) evaluator. " +
+            "Evaluate the following resume against the target role: '%s', experience required: '%d years', " +
+            "and Job Description: '%s'.\n\n" +
+            "Resume Text:\n%s\n\n" +
+            "Provide a JSON response containing precisely these keys:\n" +
+            "- atsScore (number from 0 to 100)\n" +
+            "- roleMatchScore (number from 0 to 100)\n" +
+            "- experienceScore (number from 0 to 100)\n" +
+            "- overallFeedback (string summarizing the assessment)\n" +
+            "- matchedHardSkills (array of strings found in resume)\n" +
+            "- matchedSoftSkills (array of strings found in resume)\n" +
+            "- missingSkills (array of strings missing for this role)\n" +
+            "- suggestions (array of objects with keys: category, title, description)\n" +
+            "Ensure output is pure raw JSON without markdown markers.";
+
     /**
      * Semantically analyzes resume raw text against target parameters via Google Gemini models.
      *
@@ -40,20 +56,7 @@ public class AIService {
     public String analyzeResume(String resumeText, String role, Integer experience, String jobDescription) {
         try {
             String prompt = String.format(
-                "You are an expert recruiter and Applicant Tracking System (ATS) evaluator. " +
-                "Evaluate the following resume against the target role: '%s', experience required: '%d years', " +
-                "and Job Description: '%s'.\n\n" +
-                "Resume Text:\n%s\n\n" +
-                "Provide a JSON response containing precisely these keys:\n" +
-                "- atsScore (number from 0 to 100)\n" +
-                "- roleMatchScore (number from 0 to 100)\n" +
-                "- experienceScore (number from 0 to 100)\n" +
-                "- overallFeedback (string summarizing the assessment)\n" +
-                "- matchedHardSkills (array of strings found in resume)\n" +
-                "- matchedSoftSkills (array of strings found in resume)\n" +
-                "- missingSkills (array of strings missing for this role)\n" +
-                "- suggestions (array of objects with keys: category, title, description)\n" +
-                "Ensure output is pure raw JSON without markdown markers.",
+                ATS_PROMPT_TEMPLATE,
                 role, experience, jobDescription != null ? jobDescription : "N/A", resumeText
             );
 
@@ -102,4 +105,3 @@ public class AIService {
         }
     }
 }
-

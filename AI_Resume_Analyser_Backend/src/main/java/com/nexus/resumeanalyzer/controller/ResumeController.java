@@ -1,20 +1,15 @@
 package com.nexus.resumeanalyzer.controller;
 
 import com.nexus.resumeanalyzer.entity.Analysis;
-import com.nexus.resumeanalyzer.entity.Resume;
 import com.nexus.resumeanalyzer.entity.User;
-import com.nexus.resumeanalyzer.repository.AnalysisRepository;
-import com.nexus.resumeanalyzer.repository.ResumeRepository;
 import com.nexus.resumeanalyzer.service.AnalysisService;
 import com.nexus.resumeanalyzer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.nexus.resumeanalyzer.repository.SkillRepository;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,15 +22,6 @@ public class ResumeController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private ResumeRepository resumeRepository;
-
-    @Autowired
-    private AnalysisRepository analysisRepository;
-
-    @Autowired
-    private SkillRepository skillRepository;
 
     /**
      * Uploads and analyzes a resume file against specific job parameters.
@@ -61,8 +47,7 @@ public class ResumeController {
 
         Analysis analysis = analysisService.runResumeAnalysis(file, role, experience, jobDescription, userOpt.get());
 
-        // Return clean response containing score highlights. Full details available via
-        // relationship.
+        // Return clean response containing score highlights. Full details available via relationship.
         return ResponseEntity.ok(analysis);
     }
 
@@ -77,7 +62,7 @@ public class ResumeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User profile not found.");
         }
 
-        List<Analysis> analyses = analysisRepository.findByResumeUserOrderByAnalyzedAtDesc(userOpt.get());
+        List<Analysis> analyses = analysisService.getUserHistory(userOpt.get());
         return ResponseEntity.ok(analyses);
     }
 
@@ -85,22 +70,15 @@ public class ResumeController {
      * Deletes a specific scan record from candidate logs.
      */
     @DeleteMapping("/history/{id}")
-    @Transactional
     public ResponseEntity<?> deleteScanRecord(@PathVariable("id") Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Resume> resumeOpt = resumeRepository.findById(id);
-        if (resumeOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found.");
+        try {
+            analysisService.deleteScanRecord(id, email);
+            return ResponseEntity.ok("Scan log deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
-
-        Resume resume = resumeOpt.get();
-        if (!resume.getUser().getEmail().equals(email)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized to delete this record.");
-        }
-
-        skillRepository.deleteByResume(resume);
-        analysisRepository.findByResume(resume).ifPresent(analysisRepository::delete);
-        resumeRepository.delete(resume);
-        return ResponseEntity.ok("Scan log deleted successfully.");
     }
 }
